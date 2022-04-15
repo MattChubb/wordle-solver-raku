@@ -1,6 +1,6 @@
-use v6;
+unit module Utils;
 
-sub generate_stats(@words) {
+sub generate_stats(@words) is export {
     my %stats = 0 => {}, 1 => {}, 2 => {}, 3 => {}, 4 => {};
     for @words -> $word {
         for 0..4 -> $i {
@@ -16,7 +16,7 @@ sub generate_stats(@words) {
     return %stats
 }
 
-sub word_score(%stats, $word) {
+sub word_score(%stats, $word) is export {
     my $score = 0;
     for 0..4 -> $i {
        $score += %stats{$i}{$word.substr($i, 1)};
@@ -25,19 +25,17 @@ sub word_score(%stats, $word) {
     return $score;
 }
 
-my @words = 'words'.IO.lines;
-my %stats = generate_stats(@words);
+Class Puzzle is export {
+    has $solution is required;
 
-my $topword;
-my $topscore = 0;
-for @words -> $word {
-    my $score = word_score(%stats, $word);
-    if $topscore < $score {
-        $topword = $word;
-        $topscore = $score;
+    sub guess ($word) {
+        my @response = (0, 0, 0, 0, 0);
+        for 0..4 -> $i {
+            if $word.substr($i, 1) eq $solution.substr($i, 1) {
+                @response{$i} = 2;
+            }
+            else if 
+        }
     }
 }
-say $topword, $topscore;
-
-
 
