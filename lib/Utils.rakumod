@@ -13,7 +13,7 @@ sub generate_stats(@words) is export {
         }
     }
 
-    return %stats
+    return %stats;
 }
 
 sub word_score(%stats, $word) is export {
@@ -25,17 +25,34 @@ sub word_score(%stats, $word) is export {
     return $score;
 }
 
-Class Puzzle is export {
-    has $solution is required;
+class Puzzle is export {
+    has $.solution is required;
 
-    sub guess ($word) {
-        my @response = (0, 0, 0, 0, 0);
+    method guess ($word) {
+        my @response = [0, 0, 0, 0, 0];
         for 0..4 -> $i {
-            if $word.substr($i, 1) eq $solution.substr($i, 1) {
-                @response{$i} = 2;
+            my $letter = $word.substr($i, 1);
+            if $letter eq $.solution.substr($i, 1) {
+                @response[$i] = 2;
             }
-            else if 
+            elsif $.solution.contains($letter) {
+                @response[$i] = 1;
+            }
         }
+
+        return @response;
     }
 }
+
+class Filter is export {
+    has @.indexes is required;
+    has $.is is required;
+    has $.letter is required;
+
+    method filter($word) {
+        return $word.indices($.letter).grep({$.is /[@.indexes]/ });
+    }
+}
+
+
 

@@ -16,5 +16,8 @@ for @words -> $word {
 }
 say $topword, $topscore;
 
+my $puzzle = Puzzle.new(solution => "stare");
+say $puzzle.guess("sores");
 
-
+my $filter = Filter.new(indexes => [1,3], is => True, letter => 'f')
+say $filter.filter("sores");
