@@ -26,16 +26,16 @@ sub word_score(%stats, $word) is export {
 }
 
 class Puzzle is export {
-    has $.solution is required;
+    has Str $.solution is required;
 
-    method guess ($word) {
-        my @response = [0, 0, 0, 0, 0];
+    method guess (Str $word) {
+        my @response of Int = 0, 0, 0, 0, 0;
         for 0..4 -> $i {
             my $letter = $word.substr($i, 1);
             if $letter eq $.solution.substr($i, 1) {
                 @response[$i] = 2;
             }
-            elsif $.solution.contains($letter) {
+            elsif $.solution.contains($letter, 0) {
                 @response[$i] = 1;
             }
         }
@@ -50,7 +50,7 @@ class Filter is export {
     has $.letter is required;
 
     method filter($word) {
-        return $word.indices($.letter).grep({$.is /[@.indexes]/ });
+#        return $word.indices($.letter).grep({$.is /[@.indexes]/ });
     }
 }
 

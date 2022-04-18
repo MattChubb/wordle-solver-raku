@@ -1,0 +1,29 @@
+use Test;
+use lib 'lib';
+use Utils;
+
+my @cases = (
+    {'desc' => 'Correct guess is correct',
+     'input' => 'sores',
+     'guess' => 'sores',
+     'expected' => [2,2,2,2,2]},
+    {'desc' => 'Incorrect guess is incorrect',
+     'input' => 'sores',
+     'guess' => 'aaaaa',
+     'expected' => [0,0,0,0,0]},
+    {'desc' => 'Guess is partially correct',
+     'input' => 'sores',
+     'guess' => 'stare',
+     'expected' => [2,0,0,1,1]},
+    {'desc' => 'Right letters wrong position',
+     'input' => 'sores',
+     'guess' => 'roses',
+     'expected' => [1,2,1,2,2]},
+);
+
+for @cases -> %case {
+    my $puzzle = Puzzle.new(solution => %case{"input"});
+    my $got = $puzzle.guess(%case{"guess"});
+    is $got, %case{"expected"}, %case{"desc"};
+}
+
