@@ -2,28 +2,101 @@ use Test;
 use lib 'lib';
 use Utils;
 
-my @cases = (
-    {'desc' => 'Correct guess is correct',
-     'input' => 'sores',
-     'guess' => 'sores',
-     'expected' => [2,2,2,2,2]},
-    {'desc' => 'Incorrect guess is incorrect',
-     'input' => 'sores',
-     'guess' => 'aaaaa',
-     'expected' => [0,0,0,0,0]},
-    {'desc' => 'Guess is partially correct',
-     'input' => 'sores',
-     'guess' => 'stare',
-     'expected' => [2,0,0,1,1]},
-    {'desc' => 'Right letters wrong position',
-     'input' => 'sores',
-     'guess' => 'roses',
-     'expected' => [1,2,1,2,2]},
-);
+subtest 'Puzzle' => {
+    plan 4;
+    my @cases = (
+        {'desc' => 'Correct guess is correct',
+        'input' => 'sores',
+        'guess' => 'sores',
+        'expected' => [2,2,2,2,2]},
+        {'desc' => 'Incorrect guess is incorrect',
+        'input' => 'sores',
+        'guess' => 'aaaaa',
+        'expected' => [0,0,0,0,0]},
+        {'desc' => 'Guess is partially correct',
+        'input' => 'sores',
+        'guess' => 'stare',
+        'expected' => [2,0,0,1,1]},
+        {'desc' => 'Right letters wrong position',
+        'input' => 'sores',
+        'guess' => 'roses',
+        'expected' => [1,2,1,2,2]},
+    );
 
-for @cases -> %case {
-    my $puzzle = Puzzle.new(solution => %case{"input"});
-    my $got = $puzzle.guess(%case{"guess"});
-    is $got, %case{"expected"}, %case{"desc"};
+    for @cases -> %case {
+        my $puzzle = Puzzle.new(solution => %case{"input"});
+        my $got = $puzzle.guess(%case{"guess"});
+        is $got, %case{"expected"}, %case{"desc"};
+    }
 }
 
+subtest 'Filter' => {
+    my @cases = (
+        {
+            desc => 'Sores starts with s',
+            indices => (0),
+            is => True,
+            letter => 's',
+            word => 'sores',
+            expect => True
+        },
+        {
+            desc => 'Sores ends with s',
+            indices => (4),
+            is => True,
+            letter => 's',
+            word => 'sores',
+            expect => True
+        },
+        {
+            desc => 'Sores starts or ends with s',
+            indices => (0, 4),
+            is => True,
+            letter => 's',
+            word => 'sores',
+            expect => True
+        },
+        {
+            desc => 'Sores doesnt start or end with o',
+            indices => (0, 4),
+            is => False,
+            letter => 'o',
+            word => 'sores',
+            expect => True
+        },
+        {
+            desc => 'Store starts or ends with s',
+            indices => (0, 4),
+            is => True,
+            letter => 's',
+            word => 'store',
+            expect => True
+        },
+        {
+            desc => 'Sores doesnt start with o is true',
+            indices => (0),
+            is => False,
+            letter => 'o',
+            word => 'sores',
+            expect => True
+        },
+        {
+            desc => 'Sores starts with o is false',
+            indices => (0),
+            is => True,
+            letter => 'o',
+            word => 'sores',
+            expect => False
+        },
+    );
+
+    for @cases -> %case {
+        my $filter = Filter.new(
+            is => %case{'is'},
+            indices => @(%case{'indices'}),
+            letter => %case{'letter'}
+        );
+        my $got = $filter.filter(%case{'word'});
+        is $got, %case{'expect'}, %case{'desc'};
+    }
+}

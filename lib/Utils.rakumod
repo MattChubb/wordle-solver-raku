@@ -45,13 +45,14 @@ class Puzzle is export {
 }
 
 class Filter is export {
-    has @.indexes is required;
-    has $.is is required;
-    has $.letter is required;
+    has Int @.indices is required;
+    has Bool $.is is required;
+    has Str $.letter is required;
 
     method filter($word) {
-#        return $word.indices($.letter).grep({$.is /[@.indexes]/ });
-    }
+        my $matches = $word.indices($.letter) (&) @.indices;
+        return ($matches.elems() != 0) == $.is;
+   }
 }
 
 
