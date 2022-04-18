@@ -111,6 +111,7 @@ subtest 'Filter' => {
 }
 
 subtest 'trim-wordlist' => {
+    plan 5;
     my @cases = (
         {
             desc => 'first letter is s',
@@ -187,5 +188,26 @@ subtest 'trim-wordlist' => {
     for @cases -> %case {
         my $got = trim-wordlist(%case{'words'}, %case{'filters'});
         is $got, %case{'expect'}, %case{'desc'};
+    }
+}
+
+subtest 'create-filters-from-result' => {
+    my @cases = (
+        {
+            desc => 'Bit of everything',
+            guess => 'abcde',
+            result => (0, 1, 2, 0, 2),
+            expect => (
+
+            ),
+        },
+    );
+
+    for @cases -> %case {
+        my $got = create-filters-from-result(
+            %case{'guess'},
+            Array[Int].new(@(%case{'result'}))
+        );
+        is $got, %case{'expected'}, %case{'desc'};
     }
 }

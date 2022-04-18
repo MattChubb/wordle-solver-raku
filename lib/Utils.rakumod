@@ -25,6 +25,23 @@ sub word_score(%stats, $word) is export {
     return $score;
 }
 
+sub top_word(@words) is export {
+    my %stats = generate_stats(@words);
+
+    my $topword;
+    my $topscore = 0;
+    for @words -> $word {
+        my $score = word_score(%stats, $word);
+        if $topscore < $score {
+            $topword = $word;
+            $topscore = $score;
+        }
+    }
+
+    #say $topword, $topscore;
+    return $topword;
+}
+
 class Puzzle is export {
     has Str $.solution is required;
 
@@ -92,7 +109,7 @@ sub create-filters-from-result(Str $guess, Int @result) is export {
                         letter => $guess.substr($i, 1),
                     ),
                     Filter.new(
-                        indices => ($i) (-) (0..4) ,
+                        indices => (0..4).grep( * != $i) ,
                         is => True,
                         letter => $guess.substr($i, 1),
                     )
