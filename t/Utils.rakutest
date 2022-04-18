@@ -192,13 +192,43 @@ subtest 'trim-wordlist' => {
 }
 
 subtest 'create-filters-from-result' => {
+    plan 1;
     my @cases = (
         {
             desc => 'Bit of everything',
             guess => 'abcde',
             result => (0, 1, 2, 0, 2),
-            expect => (
-
+            expect => Array[Filter].new(
+                Filter.new(
+                    indices => (0..4),
+                    is => False,
+                    letter => 'a',
+                ),
+                Filter.new(
+                    indices => (1),
+                    is => False,
+                    letter => 'b',
+                ),
+                Filter.new(
+                    indices => (0,2,3,4),
+                    is => True,
+                    letter => 'b',
+                ),
+                Filter.new(
+                    indices => (2),
+                    is => True,
+                    letter => 'c',
+                ),
+                Filter.new(
+                    indices => (0..4),
+                    is => False,
+                    letter => 'd',
+                ),
+                Filter.new(
+                    indices => (4),
+                    is => True,
+                    letter => 'e',
+                ),
             ),
         },
     );
@@ -208,6 +238,6 @@ subtest 'create-filters-from-result' => {
             %case{'guess'},
             Array[Int].new(@(%case{'result'}))
         );
-        is $got, %case{'expected'}, %case{'desc'};
+        is-deeply $got, %case{'expect'}, %case{'desc'};
     }
 }

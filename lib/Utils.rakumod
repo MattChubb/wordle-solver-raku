@@ -126,5 +126,7 @@ sub create-filters-from-result(Str $guess, Int @result) is export {
             }
         }
     }
+
+    return @filters;
 }
 
