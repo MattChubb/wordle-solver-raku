@@ -19,5 +19,5 @@ say $topword, $topscore;
 my $puzzle = Puzzle.new(solution => "stare");
 say $puzzle.guess("sores");
 
-my $filter = Filter.new(indexes => [1,3], is => True, letter => 'f')
+my $filter = Filter.new(indices => (0,1,3,4), is => True, letter => 'f');
 say $filter.filter("sores");

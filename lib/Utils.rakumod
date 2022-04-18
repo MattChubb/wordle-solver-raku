@@ -53,7 +53,61 @@ class Filter is export {
         my $matches = $word.indices($.letter) (&) @.indices;
         return ($matches.elems() != 0) == $.is;
    }
+
+    method from-hash(%attr) {
+        # Dammit Raku y u no hande lists in hashed properly?
+        self.bless(
+            is => %attr{'is'},
+            indices => @(%attr{'indices'}),
+            letter => %attr{'letter'}
+        );
+    }
 }
 
+sub trim-wordlist(@words, @filters) is export {
+    my @filtered_words = @words.grep({
+        my $word = $_;
+        @filters.map(*.filter($word)).reduce: &infix:<&&>;
+    });
+}
 
+sub create-filters-from-result(Str $guess, Int @result) is export {
+    my Filter @filters = ();
+    for 0..4 -> $i {
+        given @result[$i] {
+            when 0 {
+                @filters.push(
+                    Filter.new(
+                        indices => (0..4),
+                        is => False,
+                        letter => $guess.substr($i, 1),
+                    )
+                );
+            }
+            when 1 {
+                @filters.push(
+                    Filter.new(
+                        indices => ($i),
+                        is => False,
+                        letter => $guess.substr($i, 1),
+                    ),
+                    Filter.new(
+                        indices => ($i) (-) (0..4) ,
+                        is => True,
+                        letter => $guess.substr($i, 1),
+                    )
+                );
+            }
+            when 2 {
+                @filters.push(
+                    Filter.new(
+                        indices => ($i),
+                        is => True,
+                        letter => $guess.substr($i, 1),
+                    )
+                );
+            }
+        }
+    }
+}
 
