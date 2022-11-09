@@ -2,7 +2,7 @@ use Test;
 use lib 'lib';
 use Utils;
 
-subtest 'Puzzle' => {
+subtest 'Puzzle::guess' => {
     plan 4;
     my @cases = (
         {'desc' => 'Correct guess is correct',
@@ -29,6 +29,24 @@ subtest 'Puzzle' => {
         is $got, %case{"expected"}, %case{"desc"};
     }
 }
+
+
+# subtest 'Puzzle::solve' => {
+#     plan 4;
+#     my @cases = (
+#         {'desc' => 'Can solve single wordlist',
+#         'input' => 'sores',
+#         'words' => Array[Str].new('sores'),
+#         'expected' => 1},
+#     );
+
+#     for @cases -> %case {
+#         my $puzzle = Puzzle.new(solution => %case{"input"});
+#         my $got = $puzzle.solve(%case{"words"});
+#         is $got, %case{"expected"}, %case{"desc"};
+#     }
+# }
+
 
 subtest 'Filter' => {
     plan 8;
@@ -186,7 +204,10 @@ subtest 'trim-wordlist' => {
     );
 
     for @cases -> %case {
-        my $got = trim-wordlist(%case{'words'}, %case{'filters'});
+        my $got = trim-wordlist(
+            Array[Str].new(@(%case{'words'})),
+            Array[Filter].new(@(%case{'filters'}))
+            );
         is $got, %case{'expect'}, %case{'desc'};
     }
 }

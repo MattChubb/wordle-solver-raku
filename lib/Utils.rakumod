@@ -1,6 +1,6 @@
 unit module Utils;
 
-sub generate_stats(@words) is export {
+sub generate_stats(Str @words) is export {
     my %stats = 0 => {}, 1 => {}, 2 => {}, 3 => {}, 4 => {};
     for @words -> $word {
         for 0..4 -> $i {
@@ -16,7 +16,7 @@ sub generate_stats(@words) is export {
     return %stats;
 }
 
-sub word_score(%stats, $word) is export {
+sub word_score(%stats, Str $word) returns Int is export {
     my $score = 0;
     for 0..4 -> $i {
        $score += %stats{$i}{$word.substr($i, 1)};
@@ -25,7 +25,7 @@ sub word_score(%stats, $word) is export {
     return $score;
 }
 
-sub top_word(@words) is export {
+sub top_word(Str @words) returns Str is export {
     my %stats = generate_stats(@words);
 
     my $topword;
@@ -42,32 +42,13 @@ sub top_word(@words) is export {
     return $topword;
 }
 
-class Puzzle is export {
-    has Str $.solution is required;
-
-    method guess (Str $word) {
-        my @response of Int = 0, 0, 0, 0, 0;
-        for 0..4 -> $i {
-            my $letter = $word.substr($i, 1);
-            if $letter eq $.solution.substr($i, 1) {
-                @response[$i] = 2;
-            }
-            elsif $.solution.contains($letter, 0) {
-                @response[$i] = 1;
-            }
-        }
-
-        return @response;
-    }
-
-}
 
 class Filter is export {
     has Int @.indices is required;
     has Bool $.is is required;
     has Str $.letter is required;
 
-    method filter($word) {
+    method filter(Str $word) returns Bool {
         my $matches = $word.indices($.letter) (&) @.indices;
         return ($matches.elems() != 0) == $.is;
    }
@@ -82,15 +63,17 @@ class Filter is export {
     }
 }
 
-sub trim-wordlist(Str @words, Filter @filters) is export {
-    my @filtered_words = @words.grep({
+
+sub trim-wordlist(Str @words, Filter @filters) returns Positional[Str] is export {
+    my @filtered_words of Str = @words.grep({
         my $word = $_;
         @filters.map(*.filter($word)).reduce: &infix:<&&>;
     });
     return @filtered_words;
 }
 
-sub create-filters-from-result(Str $guess, Int @result) is export {
+
+sub create-filters-from-result(Str $guess, Int @result) returns Positional[Filter] is export {
     my Filter @filters = ();
     for 0..4 -> $i {
         given @result[$i] {
@@ -131,3 +114,51 @@ sub create-filters-from-result(Str $guess, Int @result) is export {
 
     return @filters;
 }
+
+
+class Puzzle is export {
+    has Str $.solution is required;
+
+    method guess (Str $word) returns Array[Int] {
+        my @response of Int = 0, 0, 0, 0, 0;
+        for 0..4 -> $i {
+            my $letter = $word.substr($i, 1);
+            if $letter eq $.solution.substr($i, 1) {
+                @response[$i] = 2;
+            }
+            elsif $.solution.contains($letter, 0) {
+                @response[$i] = 1;
+            }
+        }
+
+        return @response;
+    }
+
+    # method solve(Str @words) {
+    #     say "Starting with {@words.elems} words";
+
+    #     my $tries = 0;
+    #     while @words > 0 {
+    #         # Select top word from wordlist
+    #         $tries++;
+    #         my $guess = top_word(@words);
+    #         say "Trying $guess...";
+
+    #         # Try top word
+    #         my @result of Int = $.guess($guess);
+    #         say "result of $guess is {@result}";
+    #         if (@result eq [2, 2, 2, 2, 2]) {
+    #             say "Correctly guessed in $tries tries";
+    #             last;
+    #         }
+
+    #         # Create filters
+    #         my @filters of Filter = create-filters-from-result($guess, @result);
+
+    #         # Apply filters to refine wordlist
+    #         @words = trim-wordlist(@words, @filters);
+    #         say "{@words.elems} words left";
+    #     }
+    # }
+}
+
