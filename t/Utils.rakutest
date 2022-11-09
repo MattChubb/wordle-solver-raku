@@ -31,21 +31,33 @@ subtest 'Puzzle::guess' => {
 }
 
 
-# subtest 'Puzzle::solve' => {
-#     plan 4;
-#     my @cases = (
-#         {'desc' => 'Can solve single wordlist',
-#         'input' => 'sores',
-#         'words' => Array[Str].new('sores'),
-#         'expected' => 1},
-#     );
+subtest 'Puzzle::solve' => {
+    plan 4;
+    my @cases = (
+        {'desc' => 'Can solve single wordlist',
+        'input' => 'sores',
+        'words' => qw<sores>,
+        'expected' => 1},        
+        {'desc' => 'Can solve longer wordlist',
+        'input' => 'sores',
+        'words' => qw<sores store>,
+        'expected' => 1},
+        {'desc' => 'Can make more than one try',
+        'input' => 'store',
+        'words' => qw<sores store>,
+        'expected' => 2},
+        {'desc' => 'Handle case where wordlist doesnt contain solution',
+        'input' => 'brain',
+        'words' => qw<sores store>,
+        'expected' => -1},
+    );
 
-#     for @cases -> %case {
-#         my $puzzle = Puzzle.new(solution => %case{"input"});
-#         my $got = $puzzle.solve(%case{"words"});
-#         is $got, %case{"expected"}, %case{"desc"};
-#     }
-# }
+    for @cases -> %case {
+        my $puzzle = Puzzle.new(solution => %case{"input"});
+        my $got = $puzzle.solve(Array[Str].new(@(%case{"words"})));
+        is $got, %case{"expected"}, %case{"desc"};
+    }
+}
 
 
 subtest 'Filter' => {
