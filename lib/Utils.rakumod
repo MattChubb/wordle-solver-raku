@@ -134,10 +134,12 @@ class Puzzle is export {
         return @response;
     }
 
-    method solve(Str @words) returns Int {
+    method solve(Str @wordlist) returns Int {
         # say "Starting with {@words.elems} words";
 
         my $tries = 0;
+        my @words of Str = @wordlist.clone;
+        # say "{@words.elems} words in list";
         while @words > 0 {
             # Select top word from wordlist
             $tries++;
