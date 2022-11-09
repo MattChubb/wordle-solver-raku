@@ -2,22 +2,34 @@ use v6;
 use lib 'lib';
 use Utils;
 
-my @words = 'words'.IO.lines;
+my @words of Str = 'words'.IO.lines;
 my %stats = generate_stats(@words);
 
-my $topword;
-my $topscore = 0;
-for @words -> $word {
-    my $score = word_score(%stats, $word);
-    if $topscore < $score {
-        $topword = $word;
-        $topscore = $score;
-    }
-}
-say $topword, $topscore;
-
+#Init puzzle
 my $puzzle = Puzzle.new(solution => "stare");
-say $puzzle.guess("sores");
+say "Starting with {@words.elems} words";
 
-my $filter = Filter.new(indices => (0,1,3,4), is => True, letter => 'f');
-say $filter.filter("sores");
+my $tries = 0;
+while @words > 0 {
+    # Select top word from wordlist
+    $tries++;
+    my $guess = top_word(@words);
+    say "Trying $guess...";
+
+    # Try top word
+    my @result of Int = $puzzle.guess($guess);
+    say "result of $guess is {@result}";
+    if (@result eq [2, 2, 2, 2, 2]) {
+        say "Correctly guessed in $tries tries";
+        last;
+    }
+
+    # Create filters
+    my @filters of Filter = create-filters-from-result($guess, @result);
+
+    # Apply filters to refine wordlist
+    @words = trim-wordlist(@words, @filters);
+    say "{@words.elems} words left";
+}
+
+

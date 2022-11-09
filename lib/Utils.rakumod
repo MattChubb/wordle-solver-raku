@@ -59,6 +59,7 @@ class Puzzle is export {
 
         return @response;
     }
+
 }
 
 class Filter is export {
@@ -72,7 +73,7 @@ class Filter is export {
    }
 
     method from-hash(%attr) {
-        # Dammit Raku y u no hande lists in hashed properly?
+        # Dammit Raku y u no hande lists in hashes properly?
         self.bless(
             is => %attr{'is'},
             indices => @(%attr{'indices'}),
@@ -81,11 +82,12 @@ class Filter is export {
     }
 }
 
-sub trim-wordlist(@words, @filters) is export {
+sub trim-wordlist(Str @words, Filter @filters) is export {
     my @filtered_words = @words.grep({
         my $word = $_;
         @filters.map(*.filter($word)).reduce: &infix:<&&>;
     });
+    return @filtered_words;
 }
 
 sub create-filters-from-result(Str $guess, Int @result) is export {
@@ -129,4 +131,3 @@ sub create-filters-from-result(Str $guess, Int @result) is export {
 
     return @filters;
 }
-
