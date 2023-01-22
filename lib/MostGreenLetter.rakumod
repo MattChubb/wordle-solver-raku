@@ -1,6 +1,6 @@
 unit module MostGreenLetter;
 
-sub generate_stats(Str @words) is export {
+sub generate_stats(Str @words) {
     my %stats = 0 => {}, 1 => {}, 2 => {}, 3 => {}, 4 => {};
     for @words -> $word {
         for 0..4 -> $i {
@@ -16,7 +16,7 @@ sub generate_stats(Str @words) is export {
     return %stats;
 }
 
-sub word_score(%stats, Str $word) returns Int is export {
+sub word_score(%stats, Str $word) returns Int {
     my $score = 0;
     for 0..4 -> $i {
        $score += %stats{$i}{$word.substr($i, 1)};
