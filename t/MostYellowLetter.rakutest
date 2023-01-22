@@ -1,0 +1,34 @@
+use Test;
+use lib 'lib';
+use Utils;
+use MostYellowLetter;
+
+subtest 'top_word' => {
+    my @cases = (
+        {
+            desc => 'single word',
+            words => qw<queen>,
+            expect => 'queen'
+        },
+        {
+            desc => 'sores most likely to be green',
+            words => qw<sores stare trust roses>,
+            expect => 'stare'
+        },
+        {
+            desc => 'most likely to be yellow != likely to be green',
+            words => qw<abcde aefgh ibefk femdn efkmg>,
+            expect => 'efkmg'
+        },   
+        {
+            desc => 'dont count same letter twice in score',
+            words => qw<abcde aefgh ibefk femdn efkmg eeeee>,
+            expect => 'efkmg'
+        },   
+    );
+
+    for @cases -> %case {
+        my $got = top_word(Array[Str].new(@(%case{'words'})));
+        is $got, %case{'expect'}, %case{'desc'};
+    }
+}
