@@ -2,7 +2,7 @@ use v6;
 use lib 'lib';
 use Utils;
 
-my $SAMPLE_SIZE = 1;
+my $SAMPLE_SIZE = 500;
 
 my @words of Str = 'words'.IO.lines;
 my @results = race for @words.pick($SAMPLE_SIZE) -> $word {
