@@ -2,64 +2,6 @@ use Test;
 use lib 'lib';
 use Utils;
 
-subtest 'Puzzle::guess' => {
-    plan 4;
-    my @cases = (
-        {'desc' => 'Correct guess is correct',
-        'input' => 'sores',
-        'guess' => 'sores',
-        'expected' => [2,2,2,2,2]},
-        {'desc' => 'Incorrect guess is incorrect',
-        'input' => 'sores',
-        'guess' => 'aaaaa',
-        'expected' => [0,0,0,0,0]},
-        {'desc' => 'Guess is partially correct',
-        'input' => 'sores',
-        'guess' => 'stare',
-        'expected' => [2,0,0,1,1]},
-        {'desc' => 'Right letters wrong position',
-        'input' => 'sores',
-        'guess' => 'roses',
-        'expected' => [1,2,1,2,2]},
-    );
-
-    for @cases -> %case {
-        my $puzzle = Puzzle.new(solution => %case{"input"});
-        my $got = $puzzle.guess(%case{"guess"});
-        is $got, %case{"expected"}, %case{"desc"};
-    }
-}
-
-
-subtest 'Puzzle::solve' => {
-    plan 4;
-    my @cases = (
-        {'desc' => 'Can solve single wordlist',
-        'input' => 'sores',
-        'words' => qw<sores>,
-        'expected' => 1},        
-        {'desc' => 'Can solve longer wordlist',
-        'input' => 'sores',
-        'words' => qw<sores store>,
-        'expected' => 1},
-        {'desc' => 'Can make more than one try',
-        'input' => 'store',
-        'words' => qw<sores store>,
-        'expected' => 2},
-        {'desc' => 'Handle case where wordlist doesnt contain solution',
-        'input' => 'brain',
-        'words' => qw<sores store>,
-        'expected' => -1},
-    );
-
-    for @cases -> %case {
-        my $puzzle = Puzzle.new(solution => %case{"input"});
-        my $got = $puzzle.solve(Array[Str].new(@(%case{"words"})));
-        is $got, %case{"expected"}, %case{"desc"};
-    }
-}
-
-
 subtest 'Filter' => {
     plan 8;
     my @cases = (
@@ -140,7 +82,35 @@ subtest 'Filter' => {
     is $got, True, 'can construct a filter from a hash';
 }
 
-subtest 'create-filters-from-result' => {
+subtest 'Puzzle::guess' => {
+    plan 4;
+    my @cases = (
+        {'desc' => 'Correct guess is correct',
+        'input' => 'sores',
+        'guess' => 'sores',
+        'expected' => [2,2,2,2,2]},
+        {'desc' => 'Incorrect guess is incorrect',
+        'input' => 'sores',
+        'guess' => 'aaaaa',
+        'expected' => [0,0,0,0,0]},
+        {'desc' => 'Guess is partially correct',
+        'input' => 'sores',
+        'guess' => 'stare',
+        'expected' => [2,0,0,1,1]},
+        {'desc' => 'Right letters wrong position',
+        'input' => 'sores',
+        'guess' => 'roses',
+        'expected' => [1,2,1,2,2]},
+    );
+
+    for @cases -> %case {
+        my $puzzle = Puzzle.new(solution => %case{"input"});
+        my $got = $puzzle.guess(%case{"guess"});
+        is $got, %case{"expected"}, %case{"desc"};
+    }
+}
+
+subtest 'Solver::create-filters-from-result' => {
     plan 1;
     my @cases = (
         {
@@ -183,7 +153,10 @@ subtest 'create-filters-from-result' => {
     );
 
     for @cases -> %case {
-        my $got = create-filters-from-result(
+        my $solver = Solver.new(puzzle => Puzzle.new(solution => 'tests'));
+        my Method:D $create-filters-from-result = $solver.^find_private_method: 'create-filters-from-result';
+        my $got = $create-filters-from-result(
+            $solver,
             %case{'guess'},
             Array[Int].new(@(%case{'result'}))
         );
@@ -191,7 +164,7 @@ subtest 'create-filters-from-result' => {
     }
 }
 
-subtest 'trim-wordlist' => {
+subtest 'Solver::trim-wordlist' => {
     plan 5;
     my @cases = (
         {
@@ -267,10 +240,43 @@ subtest 'trim-wordlist' => {
     );
 
     for @cases -> %case {
-        my $got = trim-wordlist(
+        my $solver = Solver.new(puzzle => Puzzle.new(solution => 'tests'));
+        my Method:D $trim-wordlist = $solver.^find_private_method: 'trim-wordlist';
+        my $got = $trim-wordlist(
+            $solver,
             Array[Str].new(@(%case{'words'})),
             Array[Filter].new(@(%case{'filters'}))
             );
         is $got, %case{'expect'}, %case{'desc'};
+    }
+}
+
+subtest 'Solver::solve' => {
+    plan 4;
+    my @cases = (
+        {'desc' => 'Can solve single wordlist',
+        'input' => 'sores',
+        'words' => qw<sores>,
+        'expected' => 1},        
+        {'desc' => 'Can solve longer wordlist',
+        'input' => 'sores',
+        'words' => qw<sores store>,
+        'expected' => 1},
+        {'desc' => 'Can make more than one try',
+        'input' => 'store',
+        'words' => qw<sores store>,
+        'expected' => 2},
+        {'desc' => 'Handle case where wordlist doesnt contain solution',
+        'input' => 'brain',
+        'words' => qw<sores store>,
+        'expected' => -1},
+    );
+
+    for @cases -> %case {
+        my $solver = Solver.new(
+            puzzle => Puzzle.new(solution => %case{"input"})
+        );
+        my $got = $solver.solve(Array[Str].new(@(%case{"words"})));
+        is $got, %case{"expected"}, %case{"desc"};
     }
 }
