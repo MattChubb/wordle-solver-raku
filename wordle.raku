@@ -3,14 +3,16 @@ use lib 'lib';
 use Utils;
 use MostYellowLetter;
 use MostGreenLetter;
+use GreenPlusYellow;
 use Graphics::PLplot;
 
 my $SAMPLE_SIZE = 1000;
-my @SOLVERS = YellowLetterSolver, GreenLetterSolver;
+my @SOLVERS = YellowLetterSolver, GreenLetterSolver, GreenPlusYellowSolver;
+# my @SOLVERS = GreenPlusYellowSolver;
 
 #Compute stats
 my @stats = (['Solver', 'X', 'Y'],);
-for @SOLVERS -> $solver_module {
+race for @SOLVERS -> $solver_module {
     my @words of Str = 'words'.IO.lines;
     my @results = race for @words.pick($SAMPLE_SIZE) -> $word {
         my $puzzle = Puzzle.new(solution => $word);
