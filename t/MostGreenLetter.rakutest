@@ -86,3 +86,28 @@ subtest 'trim-wordlist' => {
         is $got, %case{'expect'}, %case{'desc'};
     }
 }
+
+subtest 'top_word' => {
+    my @cases = (
+        {
+            desc => 'single word',
+            words => qw<queen>,
+            expect => 'queen'
+        },
+        {
+            desc => 'sores most likely to be green',
+            words => qw<sores stare trust roses>,
+            expect => 'sores'
+        },
+        {
+            desc => 'most likely to be green != likely to be yellow',
+            words => qw<abcde aefgh ibejk lemdn>,
+            expect => 'abcde'
+        },   
+    );
+
+    for @cases -> %case {
+        my $got = top_word(Array[Str].new(@(%case{'words'})));
+        is $got, %case{'expect'}, %case{'desc'};
+    }
+}
