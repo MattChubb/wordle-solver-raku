@@ -43,7 +43,7 @@ class Puzzle is export {
 class Solver is export {
     has Puzzle $.puzzle is required;
 
-    method top_word(Str @words) returns Str is export {return @words.first};
+    method top_word(Str @words) returns Str {return @words.first};
 
     method !trim-wordlist(Str @words, Filter @filters) returns Positional[Str] {
         my @filtered_words of Str = @words.grep({

@@ -23,7 +23,8 @@ subtest 'top_word' => {
     );
 
     for @cases -> %case {
-        my $got = top_word(Array[Str].new(@(%case{'words'})));
+        my $solver = GreenLetterSolver.new(puzzle => Puzzle.new(solution => 'tests'));
+        my $got = $solver.top_word(Array[Str].new(@(%case{'words'})));
         is $got, %case{'expect'}, %case{'desc'};
     }
 }
